@@ -15,7 +15,7 @@ function createHeaderTemplate() {
   </section>`;
 }
 
-export default class NewTaskHeaderView {
+export default class HeaderView {
   getTemplate() {
     return createHeaderTemplate();
   }

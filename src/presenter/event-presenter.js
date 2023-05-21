@@ -1,10 +1,12 @@
-import ListView from '../view/list-view.js';
 import EditView from '../view/edit-view.js';
+import ListView from '../view/list-view.js';
 import PointView from '../view/point-view.js';
 import SortView from '../view/sort-view.js';
 import {render} from '../render.js';
 
-export default class BoardPresenter {
+const POINT_COUNT = 3;
+
+export default class EventPresenter {
   sortComponent = new SortView();
   listComponent = new ListView();
 
@@ -18,7 +20,7 @@ export default class BoardPresenter {
 
     render(new EditView(), this.listComponent.getElement());
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < POINT_COUNT; i++) {
       render(new PointView(), this.listComponent.getElement());
     }
   }
