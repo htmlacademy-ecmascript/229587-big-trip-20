@@ -1,6 +1,6 @@
 import { DATETIME_FORM_FORMAT, POINT_OPTIONS, TRAVEL_POINTS, OFFERS_OPTION } from '../const.js';
-import { createElement } from '../render.js';
-import { humanizeDate } from '../utils.js';
+import AbstractView from '../framework/view/abstract-view.js';
+import { humanizeDate } from '../utils/utils.js';
 
 const createEventTypeListTemplate = (tripPoint) =>
   POINT_OPTIONS.map((eventType) => {
@@ -160,23 +160,27 @@ const createPointEditingTemplate = (tripPoint) => {
   `;
 };
 
-export default class EditView {
-  constructor({ tripPoint }) {
-    this.tripPoint = tripPoint;
+export default class EditView extends AbstractView {
+  #tripPoint = null;
+  #handleFormSubmit = null;
+  constructor({ tripPoint, onFormSubmit }) {
+    super();
+    this.#tripPoint = tripPoint;
+    this.#handleFormSubmit = onFormSubmit;
+    this.element
+      .querySelector('form')
+      .addEventListener('submit', this.#formSubmitHandler);
+    this.element
+      .querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#formSubmitHandler);
   }
 
-  getTemplate() {
-    return createPointEditingTemplate(this.tripPoint);
+  get template() {
+    return createPointEditingTemplate(this.#tripPoint);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormSubmit();
+  };
 }

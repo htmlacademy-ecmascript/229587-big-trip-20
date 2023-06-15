@@ -1,8 +1,8 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { DATE_FORMAT, TIME_FORMAT, TIME_DELTA_FORMAT } from '../const.js';
-import { humanizeDate } from '../utils.js';
-import { createElement } from '../render.js';
+import { humanizeDate } from '../utils/utils.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 dayjs.extend(duration);
 
@@ -20,8 +20,7 @@ const getTimeDelta = (tripPoint) => {
 };
 
 const createOffersListTemplate = (tripPoint) =>
-  tripPoint.offers.map(
-    (offer) => `
+  tripPoint.offers.map((offer) => `
     <li class="event__offer">
       <span class="event__offer-title">${offer.title}</span>
       &plus;&euro;&nbsp;
@@ -31,9 +30,7 @@ const createOffersListTemplate = (tripPoint) =>
   ).join('');
 
 const createPointElementTemplate = (tripPoint) => {
-  const favoriteClassName = tripPoint.isFavorite
-    ? '  event__favorite-btn--active'
-    : '';
+  const favoriteClassName = tripPoint.isFavorite ? '  event__favorite-btn--active' : '';
   const timeDelta = getTimeDelta(tripPoint);
   const offersListTemplate = createOffersListTemplate(tripPoint);
   return `
@@ -85,24 +82,35 @@ const createPointElementTemplate = (tripPoint) => {
   `;
 };
 
+export default class PointView extends AbstractView {
+  #tripPoint = null;
+  #handleEditClick = null;
+  #handleFavoriteClick = null;
 
-export default class PointView {
-  constructor({ tripPoint }) {
-    this.tripPoint = tripPoint;
+  constructor({ tripPoint, onEditClick, onFavoriteClick }) {
+    super();
+    this.#tripPoint = tripPoint;
+    this.#handleEditClick = onEditClick;
+    this.#handleFavoriteClick = onFavoriteClick;
+    this.element
+      .querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#editClickHandler);
+    this.element
+      .querySelector('.event__favorite-btn')
+      .addEventListener('click', this.#favoriteClickHandler);
   }
 
-  getTemplate() {
-    return createPointElementTemplate(this.tripPoint);
+  get template() {
+    return createPointElementTemplate(this.#tripPoint);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleEditClick();
+  };
 
-  removeElement() {
-    this.element = null;
-  }
+  #favoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFavoriteClick();
+  };
 }
