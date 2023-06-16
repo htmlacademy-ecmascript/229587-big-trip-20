@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { POINT_OPTIONS, TRAVEL_POINTS, MOCK_DESCRIPTIONS, OFFERS_OPTION } from '../const.js';
-import { getRandomArrayElement, getRandomInt } from '../utils.js';
+import { getRandomArrayElement, getRandomInt } from '../utils/utils.js';
 
 const MOCKS_MIN_MINUTES = 10;
 const MOCKS_MAX_MINUTES = 1000;
@@ -26,7 +26,7 @@ const generateDescription = () => {
 };
 
 const createTimeGenerator = () => {
-  let lastGeneratedTime = dayjs();
+  let lastGeneratedTime = dayjs().subtract(getRandomInt(3), 'day');
   return (minutes) => {
     lastGeneratedTime = lastGeneratedTime.add(minutes, 'm');
     return lastGeneratedTime;
@@ -45,7 +45,17 @@ const generateMocksPhotos = () => {
   return array;
 };
 
+const createIdGenerator = () => {
+  let lastGeneratedId = 0;
+  return () => {
+    lastGeneratedId += 1;
+    return lastGeneratedId;
+  };
+};
+const generateId = createIdGenerator();
+
 const generateMockTripPoint = () => ({
+  id: generateId(),
   type: getRandomArrayElement(POINT_OPTIONS),
   destination: {
     city: getRandomArrayElement(TRAVEL_POINTS),

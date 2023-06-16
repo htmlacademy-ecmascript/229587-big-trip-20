@@ -1,29 +1,106 @@
-// import CreationView from '../view/creation-view';
 import EditView from '../view/edit-view.js';
-import ListView from '../view/list-view.js';
 import PointView from '../view/point-view.js';
-import SortView from '../view/sort-view.js';
-import { render } from '../render.js';
+import { render, replace, remove } from '../framework/render.js';
+
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
 
 export default class EventPresenter {
-  pointsList = new ListView();
+  #container = null;
+  #tripPoint = null;
+  #tripPointComponent = null;
+  #tripPointEditComponent = null;
+  #handleDataChange = null;
+  #handleModeChange = null;
+  #mode = Mode.DEFAULT;
 
-  constructor({ container, tripPointsModel }) {
-    this.container = container;
-    this.tripPointsModel = tripPointsModel;
+  constructor({ container, onDataChange, onModeChange }) {
+    this.#container = container;
+    this.#handleDataChange = onDataChange;
+    this.#handleModeChange = onModeChange;
   }
 
-  init() {
-    this.tripPoints = [...this.tripPointsModel.getTripPoints()];
-    render(new SortView(), this.container);
-    render(this.pointsList, this.container);
-    render(new EditView({ tripPoint: this.tripPoints[1] }), this.pointsList.getElement());
-    for (let i = 2; i < this.tripPoints.length; i++) {
-      render(
-        new PointView({ tripPoint: this.tripPoints[i] }),
-        this.pointsList.getElement()
-      );
+  init(tripPoint) {
+    this.#tripPoint = tripPoint;
+    const prevTripPointComponent = this.#tripPointComponent;
+    const prevTripPointEditComponent = this.#tripPointEditComponent;
+
+    this.#tripPointComponent = new PointView({
+      tripPoint: this.#tripPoint,
+      onEditClick: this.#handleEditClick,
+      onFavoriteClick: this.#handleFavoriteClick,
+    });
+    this.#tripPointEditComponent = new EditView({
+      tripPoint: this.#tripPoint,
+      onFormSubmit: this.#handleFormSubmit,
+    });
+
+    if (
+      prevTripPointComponent === null ||
+      prevTripPointEditComponent === null
+    ) {
+      render(this.#tripPointComponent, this.#container.element);
+      return;
+    }
+
+    if (this.#mode === Mode.DEFAULT) {
+      replace(this.#tripPointComponent, prevTripPointComponent);
+    }
+    if (this.#mode === Mode.EDITING) {
+      replace(this.#tripPointComponent, prevTripPointEditComponent);
+    }
+    remove(prevTripPointComponent);
+    remove(prevTripPointEditComponent);
+  }
+
+  destroy() {
+    remove(this.#tripPointComponent);
+    remove(this.#tripPointEditComponent);
+  }
+
+  resetView() {
+    if (this.#mode !== Mode.DEFAULT) {
+      this.#replaceFormToPoint();
     }
   }
-}
 
+  #escKeyDownHandler = (evt) => {
+    if (evt.key === 'Escape') {
+      evt.preventDefault();
+      this.#replaceFormToPoint();
+      document.removeEventListener('keydown', this.#escKeyDownHandler);
+    }
+  };
+
+  #replacePointToForm() {
+    replace(this.#tripPointEditComponent, this.#tripPointComponent);
+    document.addEventListener('keydown', this.#escKeyDownHandler);
+    this.#handleModeChange();
+    this.#mode = Mode.EDITING;
+  }
+
+  #replaceFormToPoint() {
+    replace(this.#tripPointComponent, this.#tripPointEditComponent);
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    this.#mode = Mode.DEFAULT;
+  }
+
+  #handleEditClick = () => {
+    this.#replacePointToForm();
+    document.addEventListener('keydown', this.#escKeyDownHandler);
+  };
+
+  #handleFormSubmit = () => {
+    this.#replaceFormToPoint();
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+  };
+
+  #handleFavoriteClick = () => {
+    this.#handleDataChange({
+      ...this.#tripPoint,
+      isFavorite: !this.#tripPoint.isFavorite,
+    });
+  };
+}
