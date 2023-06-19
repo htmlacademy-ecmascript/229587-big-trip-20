@@ -1,20 +1,4 @@
-export const TRAVEL_POINTS = [
-  'Amsterdam',
-  'Chamonix',
-  'Geneva',
-  'New York',
-  'Moscow',
-  'Irkutsk',
-  'Bangkok',
-  'Denpasar',
-  'Tokyo',
-  'Kioto',
-  'Havana',
-  'Seoul',
-  'Beijing',
-  'Minsk',
-  'Saint Petersburg',
-];
+import dayjs from 'dayjs';
 
 export const POINT_OPTIONS = [
   'Taxi',
@@ -26,47 +10,6 @@ export const POINT_OPTIONS = [
   'Check-in',
   'Sightseeing',
   'Restaurant',
-];
-
-export const OFFERS_OPTION = [
-  {
-    type: 'comfort',
-    title: 'Switch to comfort class',
-    price: 100,
-  },
-  {
-    type: 'luggage',
-    title: 'Add luggage',
-    price: 30,
-  },
-  {
-    type: 'meal',
-    title: 'Add meal',
-    price: 15,
-  },
-  {
-    type: 'seats',
-    title: 'Choose seats',
-    price: 5,
-  },
-  {
-    type: 'train',
-    title: 'Travel by train',
-    price: 50,
-  },
-];
-
-export const MOCK_DESCRIPTIONS = [
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-  'Cras aliquet varius magna, non porta ligula feugiat eget.',
-  'Fusce tristique felis at fermentum pharetra.',
-  'Aliquam id orci ut lectus varius viverra.',
-  'Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.',
-  'Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.',
-  'Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.',
-  'Sed sed nisi sed augue convallis suscipit in sed felis.',
-  'Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus.',
-  'In rutrum ac purus sit amet tempus.',
 ];
 
 export const FilterType = {
@@ -88,12 +31,47 @@ const TIME_FORMAT = 'HH:mm';
 const TIME_DELTA_FORMAT = 'DD[D] HH[H] mm[M]';
 const DATETIME_FORM_FORMAT = 'DD/MM/YY HH:mm';
 
-export const SortingType = {
+export const SortType = {
   DAY: 'day',
   EVENT: 'event',
   TIME: 'time',
   PRICE: 'price',
   OFFERS: 'offers',
+};
+
+export const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+  INIT: 'INIT',
+};
+
+export const UserAction = {
+  UPDATE_TRIP_POINT: 'UPDATE_TRIP_POINT',
+  ADD_TRIP_POINT: 'ADD_TRIP_POINT',
+  DELETE_TRIP_POINT: 'DELETE_TRIP_POINT',
+};
+
+export const BLANK_TRIP_POINT = {
+  type: POINT_OPTIONS[0],
+  destination: {
+    name: '',
+    description: '',
+    pictures: [],
+  },
+  timeStart: dayjs().toDate(),
+  timeFinish: dayjs().toDate(),
+  price: 0,
+  isFavorite: false,
+  offers: [],
+};
+
+export const DateTimeFormat = {
+  INFO_DATE: 'D MMM',
+  POINT_DATE: 'MMM D',
+  POINT_TIME: 'HH:mm',
+  POINT_TIME_DELTA: 'DD[D] HH[H] mm[M]',
+  FORM_DATE_TIME: 'DD/MM/YY HH:mm',
 };
 
 export {

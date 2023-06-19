@@ -1,5 +1,6 @@
 import EditView from '../view/edit-view.js';
 import PointView from '../view/point-view.js';
+import { UserAction, UpdateType } from '../const.js';
 import { render, replace, remove } from '../framework/render.js';
 
 const Mode = {
@@ -15,11 +16,21 @@ export default class EventPresenter {
   #handleDataChange = null;
   #handleModeChange = null;
   #mode = Mode.DEFAULT;
+  #availableDestinations = [];
+  #availableOffers = [];
 
-  constructor({ container, onDataChange, onModeChange }) {
+  constructor({
+    container,
+    onDataChange,
+    onModeChange,
+    availableDestinations,
+    availableOffers,
+  }) {
     this.#container = container;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
+    this.#availableDestinations = availableDestinations;
+    this.#availableOffers = availableOffers;
   }
 
   init(tripPoint) {
@@ -34,7 +45,12 @@ export default class EventPresenter {
     });
     this.#tripPointEditComponent = new EditView({
       tripPoint: this.#tripPoint,
+      availableDestinations: this.#availableDestinations,
+      availableOffers: this.#availableOffers,
+      action: UserAction.UPDATE_TRIP_POINT,
       onFormSubmit: this.#handleFormSubmit,
+      onDeleteClick: this.#handleDeleteClick,
+      onFormClose: this.#handleFormClose,
     });
 
     if (
@@ -50,6 +66,7 @@ export default class EventPresenter {
     }
     if (this.#mode === Mode.EDITING) {
       replace(this.#tripPointComponent, prevTripPointEditComponent);
+      this.#mode = Mode.DEFAULT;
     }
     remove(prevTripPointComponent);
     remove(prevTripPointEditComponent);
@@ -62,15 +79,49 @@ export default class EventPresenter {
 
   resetView() {
     if (this.#mode !== Mode.DEFAULT) {
+      this.#tripPointEditComponent.reset(this.#tripPoint);
       this.#replaceFormToPoint();
     }
+  }
+
+  setSaving() {
+    if (this.#mode === Mode.EDITING) {
+      this.#tripPointEditComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  }
+
+  setDeleting() {
+    if (this.#mode === Mode.EDITING) {
+      this.#tripPointEditComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
+  }
+
+  setAborting() {
+    if (this.#mode === Mode.DEFAULT) {
+      this.#tripPointComponent.shake();
+      return;
+    }
+    const resetFormState = () => {
+      this.#tripPointEditComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+    this.#tripPointEditComponent.shake(resetFormState);
   }
 
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape') {
       evt.preventDefault();
+      this.#tripPointEditComponent.reset(this.#tripPoint);
       this.#replaceFormToPoint();
-      document.removeEventListener('keydown', this.#escKeyDownHandler);
     }
   };
 
@@ -92,13 +143,28 @@ export default class EventPresenter {
     document.addEventListener('keydown', this.#escKeyDownHandler);
   };
 
-  #handleFormSubmit = () => {
-    this.#replaceFormToPoint();
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
+  #handleFormSubmit = (update) => {
+    this.#handleDataChange(
+      UserAction.UPDATE_TRIP_POINT,
+      UpdateType.MINOR,
+      update
+    );
+  };
+
+  #handleDeleteClick = (tripPoint) => {
+    this.#handleDataChange(
+      UserAction.DELETE_TRIP_POINT,
+      UpdateType.MINOR,
+      tripPoint
+    );
+  };
+
+  #handleFormClose = () => {
+    this.resetView();
   };
 
   #handleFavoriteClick = () => {
-    this.#handleDataChange({
+    this.#handleDataChange(UserAction.UPDATE_TRIP_POINT, UpdateType.MINOR, {
       ...this.#tripPoint,
       isFavorite: !this.#tripPoint.isFavorite,
     });

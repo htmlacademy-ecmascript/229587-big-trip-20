@@ -1,16 +1,17 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { DATE_FORMAT, TIME_FORMAT, TIME_DELTA_FORMAT } from '../const.js';
+import { DateTimeFormat } from '../const.js';
 import { humanizeDate } from '../utils/utils.js';
+import he from 'he';
 import AbstractView from '../framework/view/abstract-view.js';
 
 dayjs.extend(duration);
 
 const getTimeDelta = (tripPoint) => {
   const timeDuration = dayjs.duration(
-    tripPoint.timeFinish.diff(tripPoint.timeStart)
+    dayjs(tripPoint.timeFinish).diff(tripPoint.timeStart)
   );
-  let timeDelta = timeDuration.format(TIME_DELTA_FORMAT);
+  let timeDelta = timeDuration.format(DateTimeFormat.POINT_TIME_DELTA);
   for (let i = 1; i < 3; i++) {
     if (timeDelta.slice(0, 2) === '00') {
       timeDelta = timeDelta.slice(4);
@@ -20,24 +21,29 @@ const getTimeDelta = (tripPoint) => {
 };
 
 const createOffersListTemplate = (tripPoint) =>
-  tripPoint.offers.map((offer) => `
+  tripPoint.offers
+    .map(
+      (offer) => `
     <li class="event__offer">
       <span class="event__offer-title">${offer.title}</span>
       &plus;&euro;&nbsp;
       <span class="event__offer-price">${offer.price}</span>
     </li>
   `
-  ).join('');
+    )
+    .join('');
 
 const createPointElementTemplate = (tripPoint) => {
-  const favoriteClassName = tripPoint.isFavorite ? '  event__favorite-btn--active' : '';
+  const favoriteClassName = tripPoint.isFavorite
+    ? '  event__favorite-btn--active'
+    : '';
   const timeDelta = getTimeDelta(tripPoint);
   const offersListTemplate = createOffersListTemplate(tripPoint);
   return `
     <li class="trip-events__item">
       <div class="event">
         <time class="event__date" datetime="${tripPoint.timeStart}">
-        ${humanizeDate(tripPoint.timeStart, DATE_FORMAT)}
+        ${humanizeDate(tripPoint.timeStart, DateTimeFormat.POINT_DATE)}
         </time>
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42"
@@ -45,16 +51,16 @@ const createPointElementTemplate = (tripPoint) => {
           alt="Event type icon">
         </div>
         <h3 class="event__title">
-        ${tripPoint.type} ${tripPoint.destination.city}
+        ${tripPoint.type} ${he.encode(tripPoint.destination.name)}
         </h3>
         <div class="event__schedule">
           <p class="event__time">
             <time class="event__start-time" datetime="${tripPoint.timeStart}">
-            ${humanizeDate(tripPoint.timeStart, TIME_FORMAT)}
+            ${humanizeDate(tripPoint.timeStart, DateTimeFormat.POINT_TIME)}
             </time>
             &mdash;
             <time class="event__end-time" datetime="${tripPoint.timeFinish}">
-            ${humanizeDate(tripPoint.timeFinish, TIME_FORMAT)}
+            ${humanizeDate(tripPoint.timeFinish, DateTimeFormat.POINT_TIME)}
             </time>
           </p>
           <p class="event__duration">
