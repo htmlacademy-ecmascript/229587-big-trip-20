@@ -1,33 +1,37 @@
-import FilterView from './view/filter-view.js';
-import HeaderView from './view/header-view.js';
-import TripPointsModel from './model/point-model.js';
+import FilterModel from './model/filter-model.js';
+import PointsModel from './model/point-model.js';
+import FilterPresenter from './presenter/filter-presenter.js';
 import PointsPresenter from './presenter/points-presenter.js';
-import { generateFilter } from './mock/filter.js';
-import { generateMockTripPoint } from './mock/mocks.js';
-import { getRandomInt } from './utils/utils.js';
-import { render, RenderPosition } from './framework/render.js';
+import InfoPresenter from './presenter/info-presenter.js';
+import PointsApi from './points-api.js';
 
-const TRIP_POINTS_AMOUNT = 10;
+const AUTHORIZATION = 'Basic dgh5hd5d-gdghs5sh';
+const END_POINT = 'https://20.ecmascript.pages.academy/big-trip';
 
-const mockTripPoints = Array.from(
-  { length: getRandomInt(TRIP_POINTS_AMOUNT) },
-  generateMockTripPoint
-);
-
-const bodyElement = document.querySelector('.page-body');
-const hederElement = bodyElement.querySelector('.page-header');
-const tripElement = hederElement.querySelector('.trip-main');
-const filterElement = document.querySelector('.trip-controls__filters');
+const tripInfoElement = document.querySelector('.trip-main');
+const filtersElement = document.querySelector('.trip-controls__filters');
 const tripPointsElement = document.querySelector('.trip-events');
-const tripPointsModel = new TripPointsModel({ tripPoints: mockTripPoints });
-const pointsPresenter = new PointsPresenter({
+
+const tripPointsModel = new PointsModel({
+  tripPointsApiService: new PointsApi(END_POINT, AUTHORIZATION),
+});
+const tripInfoPresenter = new InfoPresenter({
+  container: tripInfoElement,
+  tripPointsModel,
+});
+const filterModel = new FilterModel();
+const pointsBoardPresenter = new PointsPresenter({
   container: tripPointsElement,
+  tripPointsModel,
+  filterModel,
+});
+const filterPresenter = new FilterPresenter({
+  filterContainer: filtersElement,
+  filterModel,
   tripPointsModel,
 });
 
-const filters = generateFilter(tripPointsModel.tripPoints);
-
-render(new FilterView({ filters }), filterElement);
-render(new HeaderView(), tripElement, RenderPosition.AFTERBEGIN);
-
-pointsPresenter.init();
+tripPointsModel.init();
+tripInfoPresenter.init();
+filterPresenter.init();
+pointsBoardPresenter.init();
