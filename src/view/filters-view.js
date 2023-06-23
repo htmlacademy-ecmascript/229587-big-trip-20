@@ -10,7 +10,6 @@ const createFiltersItemTemplate = (filter, currentFilterType) => `
     data-trip-points-amount="${filter.count}"
     ${filter.type === currentFilterType ? 'checked' : ''}
     ${filter.count === 0 ? 'disabled' : ''}>
-
     <label class="trip-filters__filter-label" for="filter-${filter.type}">
     ${filter.type}
     </label>
@@ -22,15 +21,14 @@ const createFiltersTemplate = (filters, currentFilterType) => {
     .map((filter) => createFiltersItemTemplate(filter, currentFilterType))
     .join('');
   return `
-    <form class="trip-filters" action="#" method="get">
-      ${filtersItemsTemplate}
-      <button class="visually-hidden" type="submit">Accept filter</button>
-    </form>
-  `;
+  <form class="trip-filters" action="#" method="get">
+    ${filtersItemsTemplate}
+    <button class="visually-hidden" type="submit">Accept filter</button>
+  </form>
+`;
 };
 
-export default class FilterView extends AbstractView {
-
+export default class FiltersView extends AbstractView {
   #filters = null;
   #currentFilter = null;
   #handleFilterTypeChange = null;

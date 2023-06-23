@@ -1,15 +1,15 @@
 import dayjs from 'dayjs';
 
 export const POINT_OPTIONS = [
-  'Taxi',
-  'Bus',
-  'Train',
-  'Ship',
-  'Drive',
-  'Flight',
-  'Check-in',
-  'Sightseeing',
-  'Restaurant',
+  'taxi',
+  'bus',
+  'train',
+  'ship',
+  'drive',
+  'flight',
+  'check-in',
+  'sightseeing',
+  'restaurant',
 ];
 
 export const FilterType = {
@@ -25,11 +25,6 @@ export const FilterTypeMessages = {
   PRESENT: 'There are no present events now',
   PAST: 'There are no past events now',
 };
-
-const DATE_FORMAT = 'MMM D';
-const TIME_FORMAT = 'HH:mm';
-const TIME_DELTA_FORMAT = 'DD[D] HH[H] mm[M]';
-const DATETIME_FORM_FORMAT = 'DD/MM/YY HH:mm';
 
 export const SortType = {
   DAY: 'day',
@@ -72,11 +67,4 @@ export const DateTimeFormat = {
   POINT_TIME: 'HH:mm',
   POINT_TIME_DELTA: 'DD[D] HH[H] mm[M]',
   FORM_DATE_TIME: 'DD/MM/YY HH:mm',
-};
-
-export {
-  DATE_FORMAT,
-  TIME_FORMAT,
-  TIME_DELTA_FORMAT,
-  DATETIME_FORM_FORMAT,
 };
