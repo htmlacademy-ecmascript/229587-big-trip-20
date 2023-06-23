@@ -1,5 +1,5 @@
 import FilterModel from './model/filter-model.js';
-import PointsModel from './model/point-model.js';
+import PointsModel from './model/points-model.js';
 import FilterPresenter from './presenter/filter-presenter.js';
 import PointsPresenter from './presenter/points-presenter.js';
 import InfoPresenter from './presenter/info-presenter.js';

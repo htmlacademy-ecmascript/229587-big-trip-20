@@ -118,8 +118,8 @@ export default class PointsPresenter {
   #renderTripPoints() {
     this.#renderPointsListComponent();
     const tripPoints = this.tripPoints;
-    for (let i = 0; i < tripPoints.length; i++) {
-      this.#renderTripPoint(tripPoints[i], this.#pointsListComponent);
+    for (const point of tripPoints) {
+      this.#renderTripPoint(point, this.#pointsListComponent);
     }
   }
 
